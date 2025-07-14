@@ -1,0 +1,81 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+
+# Virtual Environment
+.venv/
+
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# MLflow
+mlruns/
+
+# ZenML
+.zen/
+
+# Data and Models
+*.csv
+*.xlsx
+*.pkl
+*.h5
+*.joblib
+*.model
+saved_model/
+artifacts/
+datasets/
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# Docker
+.docker/
+
+# Excel temporary files
+~$*.xlsx
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.pyc
+*.pyo
+*.pyd
+
+# Cache directories
+__pycache__/
+.cache/
+.pytest_cache/
+
+# Local development settings
+local_settings.py

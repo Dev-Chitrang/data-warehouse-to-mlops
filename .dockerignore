@@ -1,0 +1,9 @@
+# Ignore everything
+**
+
+# But allow only these:
+!main.py
+!Dockerfile
+!docker-compose.yml
+!requirements.txt
+!mlruns/**

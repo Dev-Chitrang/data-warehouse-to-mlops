@@ -1,0 +1,10 @@
+joblib
+zenml[server]
+streamlit
+markupsafe
+pyodbc
+ydata-profiling
+scikit-learn
+mlflow==2.22.1
+neuralprophet==0.4.2
+holidays==0.24
