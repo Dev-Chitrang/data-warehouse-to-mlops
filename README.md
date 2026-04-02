@@ -1,144 +1,67 @@
-# 🧠 End-to-End Data Science Project with ZenML, MLflow & FastAPI
+# Data Warehouse to MLOps Pipeline
 
-This project demonstrates a complete end-to-end Data Science lifecycle starting from raw data ingestion to ML model deployment using **ZenML**, **MLflow**, **Docker**, and **FastAPI**. It follows best practices in data engineering and ML pipeline design.
+## Overview
+This system processes retail data from a structured data warehouse into machine learning models. It supports forecasting, customer classification, and product recommendation in a single MLOps workflow.
 
----
+## Architecture
+- **Data Warehouse**: SQL Server implementation using a Medallion architecture (Bronze, Silver, Gold schemas).
+- **Orchestration**: ZenML for defining and running pipeline steps.
+- **Experiment Tracking**: MLflow for logging metrics, parameters, and model artifacts.
+- **Inference Service**: FastAPI server that loads model artifacts for real-time predictions.
+- **Infrastructure**: Containerized environment using Docker.
 
-## 📌 Project Overview
+## Key Engineering Decisions
+- **Medallion Data Layering**: Separates raw ingestion (Bronze), cleaning (Silver), and business aggregation (Gold) to maintain data lineage and facilitate debugging.
+- **Factory Pattern for Ingestion**: Decouples data sources (SQL Server, Excel) from the pipeline logic.
+- **Single Pipeline**: Executes three ML tasks (forecasting, classification, recommendation) in one run for data consistency.
+- **Model Registry Decoupling**: Models are retrieved via MLflow artifact paths in the FastAPI service, separating training from inference.
 
-### 🔍 Objective
+## Features
+- Data ingestion from SQL Server and Excel sources.
+- EDA report generation via ydata-profiling.
+- Multi-model pipeline execution:
+    - Time-series forecasting using NeuralProphet.
+    - Customer classification using Scikit-learn.
+    - Product recommendation logic.
+- Containerized inference API with endpoints for each model type.
+- Model evaluation metrics stored in MLflow.
 
-To build a scalable, reproducible, and production-ready ML pipeline using structured Data Warehousing (Bronze, Silver, Gold layers), automated pipelines for training and deployment, and containerized deployment via FastAPI.
+## Tech Stack
+- **Backend**: Python 3.x, FastAPI
+- **ML Frameworks**: ZenML, MLflow, Scikit-learn, NeuralProphet
+- **Database**: SQL Server (T-SQL)
+- **Data Processing**: Pandas, pyodbc
+- **Reporting**: ydata-profiling
+- **Infrastructure**: Docker, Docker Compose
 
----
+## Workflow / API
+### Training Workflow
+1. `run_training_pipeline.py` triggers the ZenML pipeline.
+2. Data is extracted from the SQL Server Gold layer.
+3. Features are engineered and split for three separate model tasks.
+4. Models are trained, evaluated, and logged to the MLflow artifact store.
 
-## 🔁 Project Flow
+### Inference API
+The FastAPI server (`main.py`) provides the following endpoints:
+- `POST /predict/classification`: Input features to receive customer category labels.
+- `POST /predict/forecasting`: Input date sequences to receive future value predictions.
+- `POST /predict/recommendation`: Input customer/product IDs to receive product recommendations.
 
-### Step-by-Step Breakdown:
+## Challenges & Solutions
+- **Multi-Model Orchestration**: Training different model types (NeuralProphet vs. Sklearn) in one pipeline required custom wrappers to standardize inputs and outputs for ZenML steps.
+- **Windows Deployment Limits**: Since native ZenML/MLflow server deployment has limitations on Windows, a custom Docker-based deployment strategy was used to ensure portability and consistency.
 
-1. **📅 Data Ingestion**
-
-   * Raw CSV data is collected and stored in the `datasets/` directory.
-
-2. **🏗️ Data Warehousing (Bronze, Silver, Gold)**
-
-   * **Bronze**: Raw data
-   * **Silver**: Cleaned and transformed
-   * **Gold**: Aggregated and analysis-ready
-
-3. **📊 Excel Reporting**
-
-   * Business-friendly Excel reports created from Gold layer data.
-
-4. **🔁 ML Pipeline (ZenML)**
-
-   * Modular pipeline stages:
-
-     * Data Ingestion
-     * EDA (auto-generated HTML report)
-     * Data Cleaning
-     * Feature Engineering
-     * Model Training
-     * Model Evaluation
-
-5. **📈 Experiment Tracking (MLflow)**
-
-   * Track metrics, parameters, and models using MLflow.
-
-6. **🚀 Deployment**
-
-   * ❌ ZenML/MLflow Server (not supported on Windows)
-   * ✅ Docker + FastAPI based deployment
-
----
-
-## 📁 Folder Structure
-
-```
-.
-├── Data_warehouse/           # Bronze, Silver, and Gold layered data
-├── datasets/                 # Source CSV files
-├── Excel report/             # Excel report for final business analysis
-├── input_samples/            # Example inputs for inference
-├── pipelines/                # ZenML pipelines
-├── reports/                  # EDA reports
-├── src/                      # Source code for data handling & modeling
-├── steps/                    # Modular steps for each pipeline stage
-├── test/                     # Unit tests
-├── wrapper/                  # ZenML wrapper configs
-├── main.py                   # FastAPI application entry point
-├── run_training_pipeline.py  # Run training pipeline
-├── run_deployment_pipeline.py# Run deployment pipeline
-├── requirements.txt          # Python dependencies
-├── Dockerfile                # Docker container config
-├── docker-compose.yml        # Compose file (if needed)
-└── README.md                 # Project documentation
-```
-
----
-
-## 🧲 ZenML Pipeline Overview
-
-```bash
-# Run training pipeline
-python run_training_pipeline.py
-
-# Run deployment pipeline
-python run_deployment_pipeline.py
-```
-
----
-
-## 🐳 Docker + FastAPI Deployment
-
-### ⚖️ Build & Run
-
-```bash
-# Build Docker image
-docker build -t end-to-end-ml-app .
-
-# Run container
-docker run -p 8000:8000 end-to-end-ml-app
-```
-
-📍 **API Access**: [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-## 🖼️ Project Images
-
-### ⚖️ Data Warehouse Architecutre
-
-![Data Warehouse Architecutre](images/Data_warehouse_architecture.png)
-
-### 💡 Pipeline Architecture
-
-![Pipeline Architecture](images/pipeline.png)
-
-### 📊 Excel Report Sample
-
-![Excel Report](images/report.png)
-
-
----
-
-## 🧰 Tech Stack
-
-| Layer                  | Tool/Tech                       |
-| ---------------------- | ------------------------------- |
-| Data Ingestion         | CSV, Pandas                     |
-| Data Warehouse         | Bronze / Silver / Gold (manual) |
-| Pipeline Orchestration | ZenML                           |
-| Experiment Tracking    | MLflow                          |
-| Model Training         | Scikit-learn / XGBoost          |
-| Reporting              | Excel + ydata-profiling         |
-| Deployment             | FastAPI + Docker                |
-
----
-
-## 📬 Contact
-
-> Created by **Chitrang Potdar**
-> 📧 potdarchitrang4@gmail.com
-
----
+## How to Run
+1. **Configuration**: Set up database credentials in a `.env` file based on `requirements.txt` and project needs.
+2. **Train Models**: Execute the training pipeline:
+   ```bash
+   python run_training_pipeline.py
+   ```
+3. **Start Inference API**: Run the FastAPI server:
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8000
+   ```
+   Or use Docker:
+   ```bash
+   docker-compose up --build
+   ```
